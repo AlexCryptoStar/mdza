@@ -126,7 +126,9 @@ function ContainerTemplate({
                             onClick={e => {
                                 if (hasPrivateKey) onClick(routes.assetSend)
                             }}
-                        >
+                        ><Route is={routes.assetBuy}>
+                        <Send />
+                    </Route>
                             <MenuContentItemText>
                                 Send{tooltipPrivatekey}
                             </MenuContentItemText>
@@ -182,7 +184,9 @@ function ContainerTemplate({
                     <Route is={routes.asset}>
                         <Summary />
                     </Route>
-
+                    <Route is={routes.assetBuy}>
+                        <Buy />
+                    </Route>
                     <Route is={routes.assetSend}>
                         <Send />
                     </Route>

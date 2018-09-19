@@ -194,7 +194,7 @@ function HeaderTemplate({
                         <div>
                             <IconHome size={15} color="white" />
                         </div>
-                        <img src="/static/image/logo.svg" width="80" />
+                        <img src="/static/image/logo-full-blue-300x143.png" width="150" />
                     </HeaderLogo>
 
                     {/* {Object.keys(cryptoPrices).map(symbol => {
