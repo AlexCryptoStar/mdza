@@ -52,7 +52,7 @@ export default class Asset extends Component {
         const asset = this.props.asset
         const { asset_id } = getParamsFromLocation()
         const Coin = Coins[asset.symbol]
-        // console.log( 'Render', convertBalance(asset.symbol, asset.balance) )
+        console.log( 'Render', convertBalance(asset.symbol, asset.balance) )
         return React.createElement(AssetTemplate, {
             asset: this.props.asset,
             asset_id: asset_id,

@@ -287,6 +287,10 @@ export function addNotification(text, color = OK, timeout = 6000) {
     return idNotification++
 }
 
+export function alertNotification(text, color = ALERT, timeout) {
+    addNotification(text, color, timeout)
+}
+
 export function deleteNotification(id) {
     delete state.notifications[id]
 }

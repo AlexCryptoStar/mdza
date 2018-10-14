@@ -103,9 +103,9 @@ function ContentTemplate({ totalAssets, isRegistered, symbol }) {
                     <Route is={routes.import} if={symbol === 'BCH'}>
                         <ImportBCH />
                     </Route>
-                    <Route is={routes.import} if={symbol === 'TRX'}>
+                    {/* <Route is={routes.import} if={symbol === 'TRX'}>
                         <ImportTRX />
-                    </Route>
+                    </Route> */}
                     <Route
                         is={routes.import}
                         if={token_exists && Coins[symbol].type === TYPE_ERC20}
@@ -124,9 +124,9 @@ function ContentTemplate({ totalAssets, isRegistered, symbol }) {
                     <Route path-0="asset" if={isRegistered && symbol === 'BCH'}>
                         <ViewBCH />
                     </Route>
-                    <Route path-0="asset" if={isRegistered && symbol === 'TRX'}>
+                    {/* <Route path-0="asset" if={isRegistered && symbol === 'TRX'}>
                         <ViewTRX />
-                    </Route>
+                    </Route> */}
                     <Route path-0="asset" if={isRegistered}>
                         <ViewERC20 />
                     </Route>

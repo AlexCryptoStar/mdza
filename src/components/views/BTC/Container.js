@@ -184,9 +184,9 @@ function ContainerTemplate({
                     <Route is={routes.asset}>
                         <Summary />
                     </Route>
-                    <Route is={routes.assetBuy}>
+                    {/* <Route is={routes.assetBuy}>
                         <Buy />
-                    </Route>
+                    </Route> */}
                     <Route is={routes.assetSend}>
                         <Send />
                     </Route>

@@ -15,8 +15,8 @@ import { isAddress } from '/api/coins/ETH'
 import { printTemplate } from '/api/browser'
 
 import state from '/store/state'
-import { createAsset, setSeed, setHref, addNotification } from '/store/actions'
-import { getAssetId, getParamsFromLocation } from '/store/getters'
+import { createAsset, setSeed, setHref, addNotification, alertNotification} from '/store/actions'
+import { getAssetId, getParamsFromLocation} from '/store/getters'
 
 import IconPrint from 'react-icons/lib/fa/print'
 
@@ -39,28 +39,21 @@ export default class NewAsset extends Component {
         state.view = {
             step: 0,
             password: '',
-            repassword: '',
-            words_shuffle_clicked: [],
-            word_wrong_selected: false
+            repassword: ''
         }
 
         this.observer = createObserver(m => this.forceUpdate())
         this.observer.observe(state.view)
-        this.observer.observe(state.view.words_shuffle_clicked, 'length')
 
         const { symbol } = getParamsFromLocation()
-        this.words = getRandomMnemonic().split(' ')
-        this.words_shuffle = []
+        this.words = getRandomMnemonic()
         this.Coin = Coins[symbol]
 
         // binding
         this.onChangePassword = this.onChangePassword.bind(this)
         this.onChangeRepassword = this.onChangeRepassword.bind(this)
-        this.onVerifyWord = this.onVerifyWord.bind(this)
         this.onNext = this.onNext.bind(this)
         this.onBack = this.onBack.bind(this)
-        this.onPrint = this.onPrint.bind(this)
-        this.onClear = this.onClear.bind(this)
         this.onCreate = this.onCreate.bind(this)
     }
     shouldComponentUpdate() {
@@ -70,11 +63,7 @@ export default class NewAsset extends Component {
     onNext(e) {
         const collector = collect()
         state.view.step += 1
-        if (state.view.step === 2) {
-            this.words_shuffle = shuffle(this.words.slice(0))
-            state.view.words_shuffle_clicked.length = 0
-            state.view.word_wrong_selected = false
-        }
+        
         collector.emit()
     }
     onBack(e) {
@@ -85,28 +74,11 @@ export default class NewAsset extends Component {
     }
     onChangeRepassword(e) {
         state.view.repassword = e.target.value
-    }
-    onVerifyWord(word, index) {
-        const collector = collect()
-        const words_shuffle_clicked = state.view.words_shuffle_clicked
-        words_shuffle_clicked.push(index)
-        state.view.word_wrong_selected =
-            this.words[words_shuffle_clicked.length - 1] !== word
-        collector.emit()
-    }
-    onPrint() {
-        printTemplate(template(this.words.join(' ')))
-    }
-    onClear() {
-        const collector = collect()
-        state.view.words_shuffle_clicked.length = 0
-        state.view.word_wrong_selected = false
-        collector.emit()
-    }
+    }    
     onCreate() {
         const collector = collect()
         const symbol = this.Coin.symbol
-        const words = this.words.join(' ')
+        const words = this.words
         const wallet = this.Coin.getWalletFromSeed({ seed: words })
         const address = wallet.address
         const asset = createAsset(this.Coin.type, symbol, address)
@@ -114,6 +86,7 @@ export default class NewAsset extends Component {
         setSeed(asset_id, words, state.view.password)
         setHref(routes.asset({ asset_id: asset_id }))
         addNotification(`New "${symbol}" asset has been created`)
+        alertNotification(`You need to save Backup File.`)
         collector.emit()
     }
 
@@ -140,19 +113,15 @@ export default class NewAsset extends Component {
             password: state.view.password,
             repassword: state.view.repassword,
             words: this.words,
-            words_shuffle: this.words_shuffle,
-            words_shuffle_clicked: state.view.words_shuffle_clicked,
-            word_wrong_selected: state.view.word_wrong_selected,
             isPasswordFormValid: this.isPasswordFormValid,
             isRepasswordInvalid: this.isRepasswordInvalid,
             onChangePassword: this.onChangePassword,
             onChangeRepassword: this.onChangeRepassword,
-            onVerifyWord: this.onVerifyWord,
+            onExport: this.onExport,
             onNext: this.onNext,
             onBack: this.onBack,
-            onPrint: this.onPrint,
-            onClear: this.onClear,
             onCreate: this.onCreate
+
         })
     }
 }
@@ -162,28 +131,21 @@ function NewAssetTemplate({
     step,
     password,
     repassword,
-    words,
-    words_shuffle,
-    words_shuffle_clicked,
-    word_wrong_selected,
     isPasswordFormValid,
     isRepasswordInvalid,
     onChangePassword,
     onChangeRepassword,
-    onVerifyWord,
     onNext,
     onBack,
-    onPrint,
-    onClear,
     onCreate
 }) {
     return (
         <div>
             <WizardContainer>
                 <Wizard>
-                    {[0, 1, 2].map(item => {
+                    {[0, 1].map(item => {
                         return item < step ? (
-                            <WizardItem status="3">✓</WizardItem>
+                            <WizardItem status="2">✓</WizardItem>
                         ) : (
                             <WizardItem status={item > step ? 1 : 2}>
                                 {item + 1}
@@ -193,7 +155,7 @@ function NewAssetTemplate({
                 </Wizard>
             </WizardContainer>
             <WizardContainerMobile>
-                Step <span>{step + 1}</span> of 3
+                Step <span>{step + 1}</span> of 2
             </WizardContainerMobile>
 
             <Container>
@@ -249,106 +211,34 @@ function NewAssetTemplate({
                         </Content>
                     </ContainerView>
 
-                    <ContainerView>
-                        <Title>Write Down or Print Your Recovery Phrase</Title>
+                    <ContainerView>                        
+                        <Title>Congratulation</Title>
+
                         <Description>
-                            Write or print your recovery phrase and store it
-                            securely offline.{' '}
                             <strong>
-                                <span>Do not share it with anyone.</span>
+                                <span>You need to download the Backup File and Securely store offline.</span>
+                                <br>{' '}</br>
                             </strong>{' '}
-                            Your recovery phrase allows you to recover your
-                            asset in case of loss or damage.
+                            Your Backup File allows you to recover your asset in case of loss or damage.<br>{' '}</br>
+                            <strong>
+                                {' '}
+                                <span>Do not share it with anyone.</span>
+                                <br>{' '}</br>
+                            </strong>{''}
                             <strong>
                                 {' '}
                                 <span>
                                     Without it, you will not be able to access
                                     your cryptocurrency if something goes wrong.
                                 </span>
-                            </strong>{' '}
-                            Make two copies of your recovery phrase and store
-                            them in separate physical locations. Please note,
-                            your recovery phrase is case sensitive and each word
-                            must be written in the correct order.
+                            </strong>{' '}                           
                         </Description>
 
                         <Content>
-                            <Div>
-                                <Words>{words.join(' ')}</Words>
-                                <Div position="relative" top="-20px">
-                                    <Button margin="0 auto" onClick={onPrint}>
-                                        <IconPrint size={20} color="#617991" />{' '}
-                                    </Button>
-                                </Div>
-                            </Div>
-
-                            <FormField>
-                                <FormFieldButtonLeft width="29%">
-                                    <ButtonBig width="100%" onClick={onBack}>
-                                        Back
-                                    </ButtonBig>
-                                </FormFieldButtonLeft>
-                                <FormFieldButtonRight width="69%">
-                                    <ButtonBig width="100%" onClick={onNext}>
-                                        Next
-                                    </ButtonBig>
-                                </FormFieldButtonRight>
-                            </FormField>
-                        </Content>
-                    </ContainerView>
-
-                    <ContainerView>
-                        <Title>Verify Your Recovery Phrase</Title>
-
-                        <Content>
-                            <Div>
-                                <Words error={word_wrong_selected}>
-                                    {words_shuffle_clicked.length > 0
-                                        ? words_shuffle_clicked
-                                              .map(
-                                                  index => words_shuffle[index]
-                                              )
-                                              .join(' ')
-                                        : '\u00A0'}
-                                </Words>
-                                {/* <Show if={word_wrong_selected}> */}
-                                <Div
-                                    position="relative"
-                                    top="-20px"
-                                    height="20px"
-                                >
-                                    <Button
-                                        onClick={onClear}
-                                        margin="0 auto"
-                                        disabled={!word_wrong_selected}
-                                        red={true}
-                                    >
-                                        Clear
-                                    </Button>
-                                </Div>
-                                {/* </Show> */}
-                            </Div>
-                            <WordsButtons>
-                                {words_shuffle.map((word, index) => (
-                                    <Button
-                                        disabled={
-                                            word_wrong_selected ||
-                                            words_shuffle_clicked.indexOf(
-                                                index
-                                            ) > -1
-                                        }
-                                        onClick={e => onVerifyWord(word, index)}
-                                    >
-                                        {word}
-                                    </Button>
-                                ))}
-                            </WordsButtons>
-
                             <FormField>
                                 <FormFieldButtonLeft width="29%">
                                     <ButtonBig
                                         width="100%"
-                                        disabled={false}
                                         onClick={onBack}
                                     >
                                         Back
@@ -357,17 +247,13 @@ function NewAssetTemplate({
                                 <FormFieldButtonRight width="69%">
                                     <ButtonBig
                                         width="100%"
-                                        disabled={
-                                            words.length >
-                                            words_shuffle_clicked.length
-                                        }
                                         onClick={onCreate}
                                     >
                                         Create!
                                     </ButtonBig>
                                 </FormFieldButtonRight>
                             </FormField>
-                        </Content>
+                        </Content>                        
                     </ContainerView>
                 </SwitchView>
             </Container>
