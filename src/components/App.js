@@ -18,26 +18,34 @@ import {
 } from '/store/getters'
 
 
-export default class App extends React.Component {    
+export default class App extends React.Component {  
+    constructor(props) {
+        super(props)
+        this.state = {
+            seedWords: null
+        }
+    }
+
     componentWillMount() {        
         this.observer = createObserver(mutations => this.forceUpdate())
         this.observer.observe(state, 'totalAssets')
         const totalAssets = state.totalAssets
-        const res = RootToken(totalAssets, false)
+        RootToken(totalAssets, false)
         const assets = getAssetsAsArray();
         const assetId = getAssetId(assets[0])
         this.isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)
-        this.seedWords = Object.setPrototypeOf(res, String)
+        // sessionStorage.setItem('seeds', res)
+        // this.seedValue = sessionStorage.getItem('seeds')
     }
 
     componentWillUnmount() {
         this.observer.destroy()
     }
     render() {
-        if (!this.isPrivateKeyOrSeed && this.seedWords) {
+        if (!this.isPrivateKeyOrSeed) {
             return (
                 <Background>
-                    <Modals seeds={this.seedWords}/>
+                    <Modals />
                     <Notifications />
                     <SideMenu />
                     <Header />

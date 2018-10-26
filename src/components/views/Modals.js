@@ -34,7 +34,7 @@ import {
 import { CoinAssets, CoinSeeds} from '/components/partials/RootToken'
 import { RootToken, seedValue } from '/components/partials/RootToken'
 import PropTypes from 'prop-types'
-import { error } from 'util';
+import { error } from 'util'
 
 export default class Modals extends React.Component {
 	constructor(props) {
@@ -62,6 +62,11 @@ export default class Modals extends React.Component {
 		const { symbol } = getParamsFromLocation()
 		this.Coin = Coins[symbol]
 	}	
+	componentWillUnmount() {
+		this.observer.destroy()
+		this.passlength = null
+		this.repasslength = null
+	}
 
 	onNext() {		
 		state.view.step = 1
@@ -78,22 +83,20 @@ export default class Modals extends React.Component {
 	 
 	closeModal() {
 		setHref(routes.home())
-		// this.setState({ modalIsOpen: false });  
+		this.setState({ modalIsOpen: false });  
 	}
 
 	onCreateWallet() {
 		try {
 			state.view.loading = true
 			setTimeout(() => {
-				const assets = getAssetsAsArray();
-				const seedWords = this.props.seeds
+				this.seedValue = sessionStorage.getItem('seeds')
+				this.seedArray = this.seedValue.split(',')
+				const assets = getAssetsAsArray()
 				const password = state.view.password
 				assets.forEach((assetValue, key, assets) => {
 					const assetId = getAssetId(assetValue)
-					const seed = seedWords[key]	
-					if (!typeof(seed)) {						
-						throw error
-					}
+					const seed = this.seedArray[key]	
 					const isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)			
 					if (isPrivateKeyOrSeed)
 						setHref(routes.asset({ asset_id: assetId }))
@@ -112,16 +115,28 @@ export default class Modals extends React.Component {
 	}
 
 	get hasPassword() {
+		if (state.view.password) 
+			this.passlength = state.view.password.length
+		else
+			this.passlength = minpassword
         return (
-            state.view.password.length >= minpassword &&
+            this.passlength >= minpassword &&
             state.view.password === state.view.repassword
         )
     }
 	get hasRepassword() {
+		if (state.view.password && state.view.repassword) {
+			this.passlength = state.view.password.length
+			this.repasslength = state.view.repassword.length
+		}
+		else{
+			this.passlength = 0
+			this.repasslength = 0
+		}
 		return (
-			state.view.password.length > 0 &&
-			state.view.repassword.length > 0 &&
-            state.view.password.length === state.view.repassword.length &&
+			this.passlength > 0 &&
+			this.repasslength > 0 &&
+            this.passlength === this.repasslength &&
             state.view.password !== state.view.repassword
         )
     }
@@ -143,7 +158,7 @@ export default class Modals extends React.Component {
 			assetId: this.state.assetId,
 			email: state.view.email,
 			onCreateWallet: this.onCreateWallet,
-			loading: state.view.loading
+			loading: state.view.loading,
 		})
 	}
 }
@@ -308,7 +323,7 @@ function CreateModal({
 							<span><br></br></span>
 							<FormField>
 								<FormFieldButtonLeft width="25%">
-									<ButtonBig width="100%" onClick={onBack}>
+									<ButtonBig width="100%" onClick={onBack} name="close">
 										Back
 									</ButtonBig>
 								</FormFieldButtonLeft>
@@ -320,8 +335,8 @@ function CreateModal({
 										loadingIco="/static/image/loading.gif"
 									>
 									"I save my password in secure place, activate my wallets now"
-									</ButtonBig>									
-									<Show if={loading}>
+									</ButtonBig>		
+									<Show if={loading} >
 										<Div font-size="10px" color={styles.color.red}>
 											This might take several minutes<br />and can
 											freeze your browser
