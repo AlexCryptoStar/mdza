@@ -3,16 +3,22 @@ const { MAINNET, TESTNET, LOCALSTORAGE_NETWORK } = require('../../const/')
 
 const Coins = {}
 const list = [
+    'MDZA',
     'BTC',
     'ETH',
+    'XRP',
+    'EOS',
+    'XLM',
     'LTC',
+    'OMG',
+    // 'ADA',
+    'TRON',
+    'VEN',
     // 'BCH',
     'ANT',
     'ZRX',
     'QTUM',
     'TRX',
-    'EOS',
-    'OMG',
     'BNB',
     'MKR',
     'SNT',
@@ -26,6 +32,19 @@ const list = [
     'REQ',
     'KNC',
     'DAI'
+]
+
+export const rootToken = [
+    'MDZA',
+    'BTC',
+    'ETH',
+    'XRP',
+    'EOS',
+    'XLM',
+    'LTC',
+    'OMG',
+    'TRON',
+    'VEN'
 ]
 
 exports.Coins = Coins

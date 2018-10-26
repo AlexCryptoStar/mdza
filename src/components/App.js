@@ -7,27 +7,64 @@ import Header from '/components/partials/Header'
 import SideMenu from '/components/partials/SideMenu'
 import Views from '/components/partials/Views'
 import Footer from '/components/partials/Footer'
+import { createObserver } from 'dop'
+import state from '/store/state'
+import RootToken from '/components/partials/RootToken'
+import Modals from '/components/views/Modals'
+import {
+	getAssetId,
+	getAssetsAsArray,
+	isAssetWithPrivateKeyOrSeed
+} from '/store/getters'
 
 
-export default function App() {
-    return (
-        <Background>
-            <Notifications />
-            <SideMenu />
-            <Header />
-            <Views />
-            <Footer />
-            <Popups />
-        </Background>
-    )
+export default class App extends React.Component {    
+    componentWillMount() {        
+        this.observer = createObserver(mutations => this.forceUpdate())
+        this.observer.observe(state, 'totalAssets')
+        const totalAssets = state.totalAssets
+        this.res = RootToken(totalAssets, false)
+        const assets = getAssetsAsArray();
+        const assetId = getAssetId(assets[0])
+        this.isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)	
+    }
+
+    componentWillUnmount() {
+        this.observer.destroy()
+    }
+    render() {
+        if (!this.isPrivateKeyOrSeed && this.res) {
+            return (
+                <Background>
+                    <Modals seeds={this.res}/>
+                    <Notifications />
+                    <SideMenu />
+                    <Header />
+                    <Views />
+                    <Footer />
+                    <Popups />
+                </Background>
+            )
+        }
+        else {
+            return (
+                <Background>
+                    <Notifications />
+                    <SideMenu />
+                    <Header />
+                    <Views />
+                    <Footer />
+                    <Popups />
+                </Background>
+            )
+        }
+    }
 }
 
 const Background = styled.div`
     height: 100%;
     background: linear-gradient(to bottom, #007196 150px, #d7dbd5 150px);
 `
-
-
 
 // function show() {
 //     let scanner = new Instascan.Scanner({

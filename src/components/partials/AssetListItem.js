@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Modal from 'react-modal'
 import { createObserver } from 'dop'
 import styled from 'styled-components'
 import { Coins } from '/api/coins'
@@ -9,17 +10,24 @@ import { Fiats } from '/api/fiats'
 import state from '/store/state'
 import { setHref } from '/store/actions'
 import {
+    isAssetWithPrivateKeyOrSeed,
     convertBalance,
     formatCurrency,
     getAssetId,
     getLabelOrAddress,
-    getParamsFromLocation
+    getParamsFromLocation,
+    getSymbolByAssetId
 } from '/store/getters'
 import AssetItem from '/components/styled/AssetItem'
+import ModalCreate from '../views/Modals'
+
 
 export default class Asset extends Component {
     componentWillMount() {
         this.observe(this.props.asset)
+        this.observer.observe(state, 'modalIsOpen')
+
+        this.state.modalIsOpen = false
         // binding
         this.onClick = this.onClick.bind(this)
     }
@@ -45,14 +53,21 @@ export default class Asset extends Component {
     }
 
     onClick() {
-        setHref(routes.asset({ asset_id: getAssetId(this.props.asset) }))
+        const assetId = getAssetId(this.props.asset)
+        const isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)
+        const symbol = getSymbolByAssetId(assetId)
+        if (isPrivateKeyOrSeed)
+            setHref(routes.asset({ asset_id: assetId }))
+        else
+            setHref(routes.modals({ symbol: symbol }))
     }
 
     render() {
         const asset = this.props.asset
         const { asset_id } = getParamsFromLocation()
         const Coin = Coins[asset.symbol]
-        console.log( 'Render', convertBalance(asset.symbol, asset.balance) )
+        const assetId = getAssetId(asset)
+        // console.log( 'Render', convertBalance(asset.symbol, asset.balance) )
         return React.createElement(AssetTemplate, {
             asset: this.props.asset,
             asset_id: asset_id,
@@ -62,7 +77,11 @@ export default class Asset extends Component {
             ),
             logo: Coin.logo,
             balance_asset: Coin.format(asset.balance, 5),
-            onClick: this.onClick
+            onClick: this.onClick,
+            modal: this.state.modalIsOpen,
+            isPrivateKeyOrSeed: isAssetWithPrivateKeyOrSeed(assetId),
+            isValid: this.state.isValid,
+            symbol: asset.symbol
         })
     }
 }
@@ -74,23 +93,27 @@ function AssetTemplate({
     balance_currency,
     balance_asset,
     logo,
-    onClick
+    onClick,
+    symbol
 }) {
     return (
-        <AssetStyled
-            onClick={onClick}
-            selected={asset_id === getAssetId(asset)}
-        >
-            <AssetItem
-                logo={logo}
-                label={getLabelOrAddress(asset)}
-                balance={
-                    <span>
-                        <strong>{balance_currency}</strong> ≈ {balance_asset}
-                    </span>
-                }
-            />
-        </AssetStyled>
+        <div>
+            <AssetStyled
+                onClick={onClick}
+                selected={asset_id === getAssetId(asset)}
+            >
+                <AssetItem
+                    logo={logo}
+                    label={symbol}
+                    balance={
+                        <span>
+                            <strong>{balance_currency}</strong> ≈ {balance_asset}
+                        </span>
+                    }
+                />
+            </AssetStyled>
+            
+        </div>
     )
 }
 
@@ -118,3 +141,14 @@ const AssetStyled = styled.div`
         }
     }};
 `
+
+const customStyles = {
+    content : {
+        top                   : '50%',
+        left                  : '50%',
+        right                 : 'auto',
+        bottom                : 'auto',
+        marginRight           : '-50%',
+        transform             : 'translate(-50%, -50%)'
+    }
+};

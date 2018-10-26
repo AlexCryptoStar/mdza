@@ -74,7 +74,7 @@ function DeleteTemplate({ confirmed, onConfirm, onDelete }) {
                         onClick={onDelete}
                         width="100%"
                     >
-                        Delete this asset
+                        Delete this asset!!!
                     </ButtonBig>
                 </Div>
             </CenterElement>

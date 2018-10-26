@@ -123,7 +123,7 @@ export default class Dashboard extends Component {
             return category
         })
 
-        data = sortBy(data, '-balance_currency_number', '-price')
+        data = sortBy(data, '-balance_currency_number', '-name')//price
 
         const balance_start = this.balance_start
         this.balance_start = state.balance

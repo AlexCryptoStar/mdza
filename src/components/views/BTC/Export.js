@@ -104,6 +104,7 @@ export default class ExportBTC extends Component {
             const seed = getSeed(asset_id, password)
             if (seed) printTemplate(template2(seed))
             else state.view.invalid_password = true
+            
         } else {
             // Private Key
             const private_key = getPrivateKey(asset_id, password, address)

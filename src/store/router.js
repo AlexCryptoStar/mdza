@@ -8,6 +8,9 @@ export const routes = {
     home: group.add(createRoute(`/`)),
     settings: group.add(createRoute(`/settings`)),
 
+    // Modal
+    modals: group.add(createRoute(`/modals/:symbol`)),
+
     // Add
     add: group.add(createRoute(`/add(?filter=:filter)`)),
     custom: group.add(createRoute(`/custom/:type`)),
@@ -24,6 +27,7 @@ export const routes = {
     ),
     assetDelete: group.add(createRoute(`/asset/:asset_id/delete`)),
     assetSettings: group.add(createRoute(`/asset/:asset_id/settings`))
+
 }
 
 export const Router = props => {

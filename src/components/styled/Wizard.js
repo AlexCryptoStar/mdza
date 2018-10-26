@@ -80,6 +80,9 @@ const WizardItemStyled = styled.div`
                 case '2':
                     return styles.color.background3
                     break
+                case '3':
+                    return styles.color.front3
+                    break
             }
         }};
         transition: 0.75s ease background-color;
@@ -109,6 +112,9 @@ const WizardItemStyled = styled.div`
                     break
                 case '2':
                     return styles.color.background3
+                    break
+                case '3':
+                    return styles.color.front3
                     break
             }
         }};

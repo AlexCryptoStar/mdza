@@ -22,6 +22,7 @@ import Message from '/components/styled/Message'
 // Views
 import Dashboard from '/components/views/Dashboard'
 import Settings from '/components/views/Settings'
+import Modals from '/components/views/Modals'
 import Add from '/components/views/Add'
 import Create from '/components/views/Create'
 import ImportBTC from '/components/views/ImportBTC'
@@ -82,6 +83,9 @@ function ContentTemplate({ totalAssets, isRegistered, symbol }) {
                     <Route is={routes.settings}>
                         <Settings />
                     </Route>
+                    <Route is={routes.modals}>
+                        <Modals />
+                    </Route>
                     <Route is={routes.add}>
                         <Add />
                     </Route>
@@ -103,9 +107,9 @@ function ContentTemplate({ totalAssets, isRegistered, symbol }) {
                     <Route is={routes.import} if={symbol === 'BCH'}>
                         <ImportBCH />
                     </Route>
-                    {/* <Route is={routes.import} if={symbol === 'TRX'}>
-                        <ImportTRX />
-                    </Route> */}
+                    <Route is={routes.import} if={symbol === 'LTC'}>
+                        <ImportLTC />
+                    </Route> 
                     <Route
                         is={routes.import}
                         if={token_exists && Coins[symbol].type === TYPE_ERC20}
@@ -124,9 +128,9 @@ function ContentTemplate({ totalAssets, isRegistered, symbol }) {
                     <Route path-0="asset" if={isRegistered && symbol === 'BCH'}>
                         <ViewBCH />
                     </Route>
-                    {/* <Route path-0="asset" if={isRegistered && symbol === 'TRX'}>
-                        <ViewTRX />
-                    </Route> */}
+                    <Route path-0="asset" if={isRegistered && symbol === 'LTC'}>
+                        <ViewLTC />
+                    </Route>
                     <Route path-0="asset" if={isRegistered}>
                         <ViewERC20 />
                     </Route>

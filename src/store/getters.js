@@ -269,3 +269,8 @@ export function isBackupAssetsExported() {
         localStorageGet(LOCALSTORAGE_ASSETSEXPORTED, state.network) === 'true'
     )
 }
+
+export function getSymbolByAssetId(assetId) {
+    var res = assetId.split('-')
+    return res[0]
+}

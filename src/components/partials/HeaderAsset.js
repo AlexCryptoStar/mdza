@@ -142,7 +142,7 @@ function HeaderAssetTemplate({
             <Left>
                 <H1Input
                     type="text"
-                    value={label}
+                    value={symbol}
                     onChange={onChangeLabel}
                     onBlur={onBlur}
                     width="100%"
