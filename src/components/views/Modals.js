@@ -83,7 +83,7 @@ export default class Modals extends React.Component {
 	 
 	closeModal() {
 		setHref(routes.home())
-		this.setState({ modalIsOpen: false });  
+		//this.setState({ modalIsOpen: false });  
 	}
 
 	onCreateWallet() {
