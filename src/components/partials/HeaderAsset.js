@@ -101,11 +101,13 @@ export default class HeaderAsset extends Component {
         setHref(route(getParamsFromLocation()))
     }
 
-    render() {
+    render() {        
+        const symbol = this.asset.symbol
+        const label = !(this.asset.label) ? symbol : this.asset.label
         return React.createElement(HeaderAssetTemplate, {
             is_seed: isAssetWithSeed(this.asset_id),
             address: this.Coin.formatAddress(this.asset.address),
-            label: this.asset ? this.asset.label : '',
+            label: label,
             symbol: this.asset.symbol,
             logo: Coins[this.asset.symbol].logo,
             balance_asset: this.asset.balance,
@@ -142,7 +144,7 @@ function HeaderAssetTemplate({
             <Left>
                 <H1Input
                     type="text"
-                    value={symbol}
+                    value={label}
                     onChange={onChangeLabel}
                     onBlur={onBlur}
                     width="100%"

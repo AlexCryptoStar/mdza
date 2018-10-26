@@ -54,12 +54,7 @@ export default class Asset extends Component {
 
     onClick() {
         const assetId = getAssetId(this.props.asset)
-        const isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)
-        const symbol = getSymbolByAssetId(assetId)
-        if (isPrivateKeyOrSeed)
-            setHref(routes.asset({ asset_id: assetId }))
-        else
-            setHref(routes.modals({ symbol: symbol }))
+        setHref(routes.asset({ asset_id: assetId }))
     }
 
     render() {
@@ -67,6 +62,7 @@ export default class Asset extends Component {
         const { asset_id } = getParamsFromLocation()
         const Coin = Coins[asset.symbol]
         const assetId = getAssetId(asset)
+        const coinLabel = asset.label == '' ? asset.symbol : asset.label
         // console.log( 'Render', convertBalance(asset.symbol, asset.balance) )
         return React.createElement(AssetTemplate, {
             asset: this.props.asset,
@@ -81,7 +77,7 @@ export default class Asset extends Component {
             modal: this.state.modalIsOpen,
             isPrivateKeyOrSeed: isAssetWithPrivateKeyOrSeed(assetId),
             isValid: this.state.isValid,
-            symbol: asset.symbol
+            label: coinLabel
         })
     }
 }
@@ -94,7 +90,7 @@ function AssetTemplate({
     balance_asset,
     logo,
     onClick,
-    symbol
+    label
 }) {
     return (
         <div>
@@ -104,7 +100,7 @@ function AssetTemplate({
             >
                 <AssetItem
                     logo={logo}
-                    label={symbol}
+                    label={label}
                     balance={
                         <span>
                             <strong>{balance_currency}</strong> ≈ {balance_asset}

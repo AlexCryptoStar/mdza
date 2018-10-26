@@ -33,7 +33,8 @@ import {
 } from '/store/getters'
 import { CoinAssets, CoinSeeds} from '/components/partials/RootToken'
 import { RootToken, seedValue } from '/components/partials/RootToken'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
+import { error } from 'util';
 
 export default class Modals extends React.Component {
 	constructor(props) {
@@ -60,9 +61,9 @@ export default class Modals extends React.Component {
 		this.onChangePassword = this.onChangePassword.bind(this)	
 		const { symbol } = getParamsFromLocation()
 		this.Coin = Coins[symbol]
-	}
+	}	
 
-	onNext() {
+	onNext() {		
 		state.view.step = 1
 	}
 	onBack() {
@@ -77,7 +78,7 @@ export default class Modals extends React.Component {
 	 
 	closeModal() {
 		setHref(routes.home())
-		// this.setState({modalIsOpen: true});
+		// this.setState({ modalIsOpen: false });  
 	}
 
 	onCreateWallet() {
@@ -89,8 +90,10 @@ export default class Modals extends React.Component {
 				const password = state.view.password
 				assets.forEach((assetValue, key, assets) => {
 					const assetId = getAssetId(assetValue)
-					var seed = seedWords[key]
-	
+					const seed = seedWords[key]	
+					if (!typeof(seed)) {						
+						throw error
+					}
 					const isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)			
 					if (isPrivateKeyOrSeed)
 						setHref(routes.asset({ asset_id: assetId }))
@@ -108,13 +111,13 @@ export default class Modals extends React.Component {
 		}
 	}
 
-	get isPasswordFormValid() {
+	get hasPassword() {
         return (
             state.view.password.length >= minpassword &&
             state.view.password === state.view.repassword
         )
     }
-	get isRepasswordInvalid() {
+	get hasRepassword() {
 		return (
 			state.view.password.length > 0 &&
 			state.view.repassword.length > 0 &&
@@ -131,8 +134,8 @@ export default class Modals extends React.Component {
 			step: state.view.step,
 			password: state.view.password,
 			repassword: state.view.repassword,
-			isPasswordFormValid: this.isPasswordFormValid,
-			isRepasswordInvalid: this.isRepasswordInvalid,
+			hasPassword: this.hasPassword,
+			hasRepassword: this.hasRepassword,
 			onChangePassword: this.onChangePassword,
 			onChangeRepassword: this.onChangeRepassword, 
 			onNext: this.onNext,
@@ -152,8 +155,8 @@ function CreateModal({
 	step,
 	password,
 	repassword,
-	isPasswordFormValid,
-	isRepasswordInvalid,
+	hasPassword,
+	hasRepassword,
 	onChangePassword,
 	onChangeRepassword, 
 	onNext, 
@@ -223,11 +226,11 @@ function CreateModal({
 										placeholder="Repeat Password"
 										minlength={minpassword}
 										error={
-											isRepasswordInvalid
+											hasRepassword
 												? 'Passwords do not match'
 												: null
 										}
-										invalid={isRepasswordInvalid}
+										invalid={hasRepassword}
 										value={repassword}
 										onChange={onChangeRepassword}
 										width="100%"
@@ -248,7 +251,7 @@ function CreateModal({
 									<FormFieldButtonRight width="100%">
 										<ButtonBig
 											width="100%"
-											disabled={!isPasswordFormValid}
+											disabled={!hasPassword}
 											onClick={onNext}
 										>
 											Next
@@ -336,8 +339,8 @@ function CreateModal({
 	)
 }
 
-Modals.PropTypes = {
-	seeds: PropTypes.arrayOf(PropTypes.string)
+Modals.propTypes = {
+	seeds: PropTypes.array
 }
 
 const customStyles = {

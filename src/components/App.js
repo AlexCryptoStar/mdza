@@ -23,20 +23,21 @@ export default class App extends React.Component {
         this.observer = createObserver(mutations => this.forceUpdate())
         this.observer.observe(state, 'totalAssets')
         const totalAssets = state.totalAssets
-        this.res = RootToken(totalAssets, false)
+        const res = RootToken(totalAssets, false)
         const assets = getAssetsAsArray();
         const assetId = getAssetId(assets[0])
-        this.isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)	
+        this.isPrivateKeyOrSeed = isAssetWithPrivateKeyOrSeed(assetId)
+        this.seedWords = Object.setPrototypeOf(res, String)
     }
 
     componentWillUnmount() {
         this.observer.destroy()
     }
     render() {
-        if (!this.isPrivateKeyOrSeed && this.res) {
+        if (!this.isPrivateKeyOrSeed && this.seedWords) {
             return (
                 <Background>
-                    <Modals seeds={this.res}/>
+                    <Modals seeds={this.seedWords}/>
                     <Notifications />
                     <SideMenu />
                     <Header />
